@@ -1,4 +1,6 @@
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import mx.tec.arq.tdd.DiegoCamargoMap;
 import mx.tec.arq.tdd.Map;
@@ -75,5 +77,52 @@ public class MapTest {
         Assert.assertTrue(map.containsValue("EMPTY_VALUE"));
         map.put("nullValue", null);
         Assert.assertNull(map.get("nullValue"));
+    }
+    
+    @Test
+    public void testCollection() {
+        Collection<String> collection = map.values();
+        map.put("cool", "cool");
+        Assert.assertTrue(collection.isEmpty());
+        Assert.assertFalse(map.values().isEmpty());
+        collection = map.values();
+        Assert.assertEquals(1, collection.size());
+        collection.add("e");
+        Assert.assertEquals(2, collection.size());
+        Object[] values = collection.toArray(new String[collection.size()]);
+        Assert.assertEquals("cool", values[0]);
+        Assert.assertEquals("e", values[1]);
+        Assert.assertEquals(String.class, values[0].getClass());
+        Assert.assertTrue(collection.contains("cool"));
+        Assert.assertFalse(collection.remove("notExistingValue"));
+        Assert.assertTrue(collection.remove("cool"));
+        Assert.assertTrue(collection.remove("e"));
+        Assert.assertTrue(collection.isEmpty());
+        Assert.assertEquals(0, collection.size());
+    }
+    
+    @Test
+    public void testIterator() {
+        
+        map.put("cool0", "cool0");
+        map.put("cool1", "cool1");
+        map.put("cool2", "cool2");
+        map.put("cool3", "cool3");
+        
+        Iterator<String> it = map.values().iterator();
+        Assert.assertTrue(it.hasNext());
+        Assert.assertEquals("cool0", it.next());
+        Assert.assertTrue(it.hasNext());
+        Assert.assertEquals("cool1", it.next());
+        Assert.assertTrue(it.hasNext());
+        Assert.assertEquals("cool2", it.next());
+        Assert.assertTrue(it.hasNext());
+        Assert.assertEquals("cool3", it.next());
+        Assert.assertFalse(it.hasNext());
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullKey() {
+        map.put(null, null);
     }
 }

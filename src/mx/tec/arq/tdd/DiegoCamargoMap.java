@@ -12,6 +12,8 @@ import java.util.NoSuchElementException;
 /**
  *
  * @author Diego
+ * @param <K> Key Type
+ * @param <V> Value Type
  */
 public class DiegoCamargoMap <K, V> implements Map <K, V> {
     
@@ -19,7 +21,6 @@ public class DiegoCamargoMap <K, V> implements Map <K, V> {
     private final V EMPTY_VALUE;
     
     private V[] map;
-    private int maxSize;
     private int size;
     
     public DiegoCamargoMap() {
@@ -27,8 +28,7 @@ public class DiegoCamargoMap <K, V> implements Map <K, V> {
     }
     
     public DiegoCamargoMap(int size) {
-        this.maxSize = size;
-        this.map = (V[]) new Object[this.maxSize];
+        this.map = (V[]) new Object[size];
         this.EMPTY_VALUE = (V) new Object();
         this.clear();
     }
@@ -36,20 +36,21 @@ public class DiegoCamargoMap <K, V> implements Map <K, V> {
     @Override
     public void clear() {
         this.size = 0;
-        for (int i = 0 ; i < this.maxSize; i++) {
+        for (int i = 0 ; i < this.map.length; i++) {
             this.map[i] = EMPTY_VALUE;
         }
     }
 
     @Override
     public boolean containsKey(K key) {
-        return this.map[this.convertKey(key)] != EMPTY_VALUE;
+        requireNonNull(key, "Key can't be null");
+        return this.map[convertKey(key, this.map.length)] != EMPTY_VALUE;
     }
 
     @Override
     public boolean containsValue(V value) {
-        for (int i = 0; i < this.maxSize; i++) {
-            if (value.equals(this.map[i])) {
+        for (V map1 : this.map) {
+            if (value.equals(map1)) {
                 return true;
             }
         }
@@ -58,12 +59,14 @@ public class DiegoCamargoMap <K, V> implements Map <K, V> {
 
     @Override
     public V get(K key) {
-        return this.map[this.convertKey(key)];
+        requireNonNull(key, "Key can't be null");
+        return this.map[convertKey(key, this.map.length)];
     }
 
     @Override
     public V getOrDefault(K key, V defaultValue) {
-        V value = this.map[this.convertKey(key)];
+        requireNonNull(key, "Key can't be null");
+        V value = this.map[convertKey(key, this.map.length)];
         return value == EMPTY_VALUE ? defaultValue : value;
     }
 
@@ -74,27 +77,28 @@ public class DiegoCamargoMap <K, V> implements Map <K, V> {
 
     @Override
     public void put(K key, V value) {
-        this.map[this.convertKey(key)] = value; 
+        requireNonNull(key, "Key can't be null");
+        this.map[convertKey(key, this.map.length)] = value; 
         this.size++;
     }
 
     @Override
     public V remove(K key) {
-        V value = this.map[this.convertKey(key)];
-        this.map[this.convertKey(key)] = null;
+        requireNonNull(key, "Key can't be null");
+        V value = this.map[convertKey(key, this.map.length)];
+        this.map[convertKey(key, this.map.length)] = EMPTY_VALUE;
         if (value != EMPTY_VALUE) {
             this.size--;
             return value;
         } else {
             return null;
         }
-        
     }
 
     @Override
     public boolean replace(K key, V value) throws NoSuchElementException {
         if (this.containsKey(key)) {
-            this.map[this.convertKey(key)] = value;
+            this.map[convertKey(key, this.map.length)] = value;
             return true;
         } else {
             throw new NoSuchElementException("Key does not exist, cannot replace");
@@ -105,79 +109,165 @@ public class DiegoCamargoMap <K, V> implements Map <K, V> {
     public int size() {
         return this.size;
     }
-
+    
     @Override
-    public Collection values() {
+    public Collection<V> values() {
         return new Collection<V>() {
+            
+            private int len = 0;
+            private final V[] values;
+            
+            {
+                values = (V[]) new Object[map.length];
+                for (V value : map) {
+                    if (value != EMPTY_VALUE) {
+                        values[this.len++] = value;
+                    }
+                }
+            }
+            
+            
             @Override
             public int size() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                return this.len;
             }
 
             @Override
             public boolean isEmpty() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                return this.len == 0;
             }
 
             @Override
             public boolean contains(Object o) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                for (int i = 0; i < this.len; i++) {
+                    if (o.equals(this.values[i])) {
+                        return true;
+                    }
+                }
+                return false;
             }
 
             @Override
-            public Iterator<V> iterator() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public Iterator iterator() {
+                return new Iterator() {
+                    
+                    private final int length;
+                    private final Object[] itValues;
+                    private int position;
+                    
+                    {
+                        length = len;
+                        itValues = values;
+                        position = 0;
+                    }
+                    
+                    @Override
+                    public boolean hasNext() {
+                        return position < length;
+                    }
+
+                    @Override
+                    public Object next() {
+                        return itValues[position++];
+                    }
+                };
             }
 
             @Override
             public Object[] toArray() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                V[] resultingArray = (V[]) new Object[this.len];
+                System.arraycopy(this.values, 0, resultingArray, 0, this.len);
+                return resultingArray;
             }
 
             @Override
-            public <T> T[] toArray(T[] a) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public Object[] toArray(Object[] a) {
+                Object[] existingArray = this.toArray();
+                Object[] resultingArray = new Object[existingArray.length];
+                for (int i = 0; i < existingArray.length; i++) {
+                    resultingArray[i] = a.getClass().getComponentType().cast(existingArray[i]);
+                }
+                return resultingArray;
             }
 
             @Override
-            public boolean add(V e) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public boolean add(Object e) {
+                if (this.len < this.values.length) {
+                    this.values[this.len++] = (V) e;
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
             @Override
             public boolean remove(Object o) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                for (int i = 0; i < this.values.length; i++) {
+                    if (o.equals(this.values[i])) {
+                        this.values[i] = EMPTY_VALUE;
+                        this.len--;
+                        return true;
+                    }
+                }
+                return false;
             }
 
             @Override
-            public boolean containsAll(Collection<?> c) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public boolean containsAll(Collection c) {
+                for (Object value : c.toArray()){
+                    if (!this.contains(value)) {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             @Override
-            public boolean addAll(Collection<? extends V> c) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public boolean addAll(Collection c) {
+                boolean addedAll = true;
+                for (Object value : c.toArray()) {
+                    if(!this.add(value)) {
+                        addedAll = false;
+                    }
+                }
+                return addedAll;
             }
 
             @Override
-            public boolean removeAll(Collection<?> c) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public boolean removeAll(Collection c) {
+                boolean removedAll = true;
+                for (Object value : c.toArray()) {
+                    if(!this.remove(value)) {
+                        removedAll = false;
+                    }
+                }
+                return removedAll;
             }
 
             @Override
-            public boolean retainAll(Collection<?> c) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public boolean retainAll(Collection c) {
+                boolean retainedAll = true;
+                //TODO implement me
+                return retainedAll;
             }
 
             @Override
             public void clear() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                for (int i = 0; i < this.values.length; i++) {
+                    this.values[i] = EMPTY_VALUE;
+                }
+                this.len = 0;
             }
         };
     }
     
-    private int convertKey(K key) {
-        return Math.abs(key.hashCode() % this.maxSize);
+    private static int convertKey(Object key, int clamp) {
+        return Math.abs(key.hashCode() % clamp);
     }
     
+    private static void requireNonNull(Object obj, String message) {
+        if (obj == null) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 }
