@@ -5,7 +5,9 @@
  */
 package mx.tec.arq.tdd;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -17,7 +19,7 @@ import java.util.NoSuchElementException;
  */
 public class DiegoCamargoMap <K, V> implements Map <K, V> {
     
-    private final static int DEFAULT_SIZE = 999;
+    private final static int DEFAULT_SIZE = 9999;
     private final V EMPTY_VALUE;
     
     private V[] map;
@@ -112,6 +114,17 @@ public class DiegoCamargoMap <K, V> implements Map <K, V> {
     
     @Override
     public Collection<V> values() {
+        V[] values = (V[]) new Object[this.size];
+        int position = 0;
+        for (V value : this.map) {
+            if (value != EMPTY_VALUE) {
+                values[position++] = value;
+            }
+        }
+        return new HashSet<>(Arrays.asList(values));
+    }
+    
+    public Collection<V> values2() {
         return new Collection<V>() {
             
             private int len = 0;
@@ -247,7 +260,9 @@ public class DiegoCamargoMap <K, V> implements Map <K, V> {
             @Override
             public boolean retainAll(Collection c) {
                 boolean retainedAll = true;
-                //TODO implement me
+                for (Object value : c.toArray()) {
+                    
+                }
                 return retainedAll;
             }
 

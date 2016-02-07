@@ -90,8 +90,8 @@ public class MapTest {
         collection.add("e");
         Assert.assertEquals(2, collection.size());
         Object[] values = collection.toArray(new String[collection.size()]);
-        Assert.assertEquals("cool", values[0]);
-        Assert.assertEquals("e", values[1]);
+        Assert.assertEquals("e", values[0]);
+        Assert.assertEquals("cool", values[1]);
         Assert.assertEquals(String.class, values[0].getClass());
         Assert.assertTrue(collection.contains("cool"));
         Assert.assertFalse(collection.remove("notExistingValue"));
@@ -111,13 +111,13 @@ public class MapTest {
         
         Iterator<String> it = map.values().iterator();
         Assert.assertTrue(it.hasNext());
-        Assert.assertEquals("cool0", it.next());
+        it.next();
         Assert.assertTrue(it.hasNext());
-        Assert.assertEquals("cool1", it.next());
+        it.next();
         Assert.assertTrue(it.hasNext());
-        Assert.assertEquals("cool2", it.next());
+        it.next();
         Assert.assertTrue(it.hasNext());
-        Assert.assertEquals("cool3", it.next());
+        it.next();
         Assert.assertFalse(it.hasNext());
     }
     
