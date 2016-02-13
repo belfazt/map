@@ -73,7 +73,11 @@ public class MapTest {
         map.put("coolKey", "coolValue");
         Assert.assertTrue(map.containsKey("coolKey"));
         Assert.assertTrue(map.containsValue("coolValue"));
+        Assert.assertEquals(1, map.size());
         Assert.assertTrue(map.replace("coolKey", "replacedCoolValue"));
+        Assert.assertEquals(1, map.size());
+        map.put("coolKey", "replacedCoolValue");
+        Assert.assertEquals(1, map.size());
         Assert.assertFalse(map.containsValue("coolValue"));
         Assert.assertTrue(map.containsValue("replacedCoolValue"));
         map.replace("keyDoesNotExist", "");
