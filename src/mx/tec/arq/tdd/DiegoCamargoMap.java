@@ -45,7 +45,7 @@ public class DiegoCamargoMap<K, V> implements Map<K, V> {
     @Override
     public boolean containsKey(K key) {
         requireNonNull(key, CANT_BE_NULL);
-        return this.map[convertKey(key)].getKey() != EMPTY.getKey();
+        return this.map[avoidCollision(key)].getKey() != EMPTY.getKey();
     }
 
     @Override
@@ -61,14 +61,14 @@ public class DiegoCamargoMap<K, V> implements Map<K, V> {
     @Override
     public V get(K key) {
         requireNonNull(key, CANT_BE_NULL);
-        V value = this.map[convertKey(key)].getValue();
+        V value = this.map[avoidCollision(key)].getValue();
         return value == EMPTY.getValue() ? null : value;
     }
 
     @Override
     public V getOrDefault(K key, V defaultValue) {
         requireNonNull(key, CANT_BE_NULL);
-        V value = this.map[convertKey(key)].getValue();
+        V value = this.map[avoidCollision(key)].getValue();
         return value == EMPTY.getValue() ? defaultValue : value;
     }
 
