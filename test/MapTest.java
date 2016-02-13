@@ -13,14 +13,14 @@ import org.junit.Test;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author jzab
  */
 public class MapTest {
+
     private Map<String, String> map;
-    
+
     @Before
     public void setUp() {
         map = new DiegoCamargoMap();
@@ -31,7 +31,7 @@ public class MapTest {
         Assert.assertFalse(map.containsKey("coolKey"));
         Assert.assertEquals(0, map.size());
     }
-    
+
     @Test
     public void testAdd() {
         map.put("coolKey", "coolValue");
@@ -46,8 +46,17 @@ public class MapTest {
         Assert.assertTrue(map.containsKey("coolKey3"));
         Assert.assertTrue(map.containsValue("coolValue3"));
         Assert.assertEquals(3, map.size());
+        map.put("coolKey4", "coolValue4");
+        Assert.assertTrue(map.containsKey("coolKey4"));
+        Assert.assertTrue(map.containsValue("coolValue4"));
+        Assert.assertEquals(4, map.size());
+        map.put("coolKey5", "coolValue5");
+        Assert.assertTrue(map.containsKey("coolKey5"));
+        Assert.assertTrue(map.containsValue("coolValue5"));
+        Assert.assertEquals(5, map.size());
+        System.out.println(this.map);
     }
-    
+
     @Test
     public void testRemove() {
         map.put("coolKey", "coolValue");
@@ -58,7 +67,7 @@ public class MapTest {
         Assert.assertEquals("coolValue", map.remove("coolKey"));
         Assert.assertEquals(0, map.size());
     }
-    
+
     @Test(expected = NoSuchElementException.class)
     public void testReplace() {
         map.put("coolKey", "coolValue");
@@ -69,7 +78,7 @@ public class MapTest {
         Assert.assertTrue(map.containsValue("replacedCoolValue"));
         map.replace("keyDoesNotExist", "");
     }
-    
+
     @Test
     public void testEmptyValue() {
         Assert.assertFalse(map.containsValue("EMPTY_VALUE"));
@@ -78,7 +87,7 @@ public class MapTest {
         map.put("nullValue", null);
         Assert.assertNull(map.get("nullValue"));
     }
-    
+
     @Test
     public void testCollection() {
         Collection<String> collection = map.values();
@@ -90,8 +99,8 @@ public class MapTest {
         collection.add("e");
         Assert.assertEquals(2, collection.size());
         Object[] values = collection.toArray(new String[collection.size()]);
-        Assert.assertEquals("e", values[0]);
-        Assert.assertEquals("cool", values[1]);
+        Assert.assertEquals("cool", values[0]);
+        Assert.assertEquals("e", values[1]);
         Assert.assertEquals(String.class, values[0].getClass());
         Assert.assertTrue(collection.contains("cool"));
         Assert.assertFalse(collection.remove("notExistingValue"));
@@ -100,15 +109,15 @@ public class MapTest {
         Assert.assertTrue(collection.isEmpty());
         Assert.assertEquals(0, collection.size());
     }
-    
+
     @Test
     public void testIterator() {
-        
+
         map.put("cool0", "cool0");
         map.put("cool1", "cool1");
         map.put("cool2", "cool2");
         map.put("cool3", "cool3");
-        
+
         Iterator<String> it = map.values().iterator();
         Assert.assertTrue(it.hasNext());
         it.next();
@@ -120,9 +129,23 @@ public class MapTest {
         it.next();
         Assert.assertFalse(it.hasNext());
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testNullKey() {
         map.put(null, null);
+    }
+
+    @Test
+    public void testResizing() {
+        this.map = new DiegoCamargoMap(1);
+        map.put("coolKey", "coolValue");
+        Assert.assertEquals(1, map.size());
+        map.put("coolKey2", "coolValue2");
+        Assert.assertEquals(2, map.size());
+    }
+
+    @Test
+    public void testGetOrDefault() {
+        Assert.assertEquals("hello", map.getOrDefault("nonExistent", "hello"));
     }
 }
